@@ -33,7 +33,7 @@ views/index.html
     var z = 345;
 </script>
 ```
-See the full [example](https://github.com/korbai/koa-cheerio-template/example/)!
+See the full [example](https://github.com/korbai/koa-cheerio-template/tree/master/example)!
 
 
 ```js
