@@ -5,6 +5,7 @@ Inspired by [cheerio-template](https://www.npmjs.com/package/cheerio-template)
 which I used a lot for my express based projects.
 
 # Features
+- "no template" style server side templating with jQuery syntax
 - layout, extend, placeholder, block, include
 - unlimited level of hierarchy
 - html editor friendly
@@ -27,6 +28,7 @@ views/index.html
 <div data-template-block="content">
     <h2>Sample for including component</h2>
     <div data-template-include="component"></div>
+    Hello <span id="hello"></span>
 </div>
 
 <script data-template-block="code">
@@ -48,6 +50,7 @@ app.use(render({
 
 app.use(function * (next) {
   var $ = yield this.render('index');
+  $('#hello').text(', World!');
 });
 
 app.listen(3000);

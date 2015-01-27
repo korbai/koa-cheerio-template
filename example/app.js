@@ -9,6 +9,7 @@ app.use(render({
 
 app.use(function * (next) {
   var $ = yield this.render('index');
+  $('#hello').text(', World!');
 });
 
 app.listen(3000);
