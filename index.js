@@ -1,8 +1,8 @@
 var fs = require('co-fs-extra');
 var path = require('path');
 var cheerio = require('cheerio');
-
-console.log = require('debug')('template');
+var debug = require('debug')('template');
+//debug = console.log;
 
 // supports div and script tag, too with optional value
 function dataTag(name, value) {
@@ -23,14 +23,14 @@ module.exports = function (settings) {
     // theoretically unlimited parent view
     while (view) {
       var viewfile = path.join(settings.root, view + settings.ext);
-      console.log('rendering', viewfile);
+      debug('rendering', viewfile);
       var text = yield fs.readFile(viewfile, 'utf8');
       $ = cheerio.load(text, opts);
       // first: replace all include-placeholders with given contents
       $(dataTag('include')).each(function () {
         var name = $(this).data().templateInclude;
         var viewfile = path.join(settings.root, name + settings.ext);
-        console.log('including', viewfile);
+        debug('including', viewfile);
         var text = fs.readFileSync(viewfile, 'utf8'); // !TODO async
         $(this).replaceWith(text);
       });
@@ -40,14 +40,14 @@ module.exports = function (settings) {
         var processed = false;
         var $div = $(dataTag('placeholder', name));
         if ($div.length) {
-          console.log('replacing', name);
+          debug('replacing', name);
           $div.replaceWith(block);
           processed = true;
         } else {
           // if there is no named placeholder try to insert into end of a block with same name
           $div = $(dataTag('block', name));
           if ($div.length) {
-            console.log('appending', name, 'to block');
+            debug('appending', name, 'to block');
             $div.append(block);
             processed = true;
           } else {
@@ -56,7 +56,7 @@ module.exports = function (settings) {
               case 'head':
                 $div = $('head');
                 if ($div.length) {
-                  console.log('appending', name, 'to head');
+                  debug('appending', name, 'to head');
                   $div.append(block);
                   processed = true;
                 }
@@ -65,7 +65,7 @@ module.exports = function (settings) {
               case 'code':
                 $div = $('body');
                 if ($div.length) {
-                  console.log('appending', name, 'to body');
+                  debug('appending', name, 'to body');
                   $div.append(block);
                   processed = true;
                 }
@@ -79,19 +79,19 @@ module.exports = function (settings) {
         if (processed) {
           delete opts.blocks[name];
         } else {
-          console.log('moving up', name);
+          debug('moving up', name);
         }
       }
       // third: remove all not replaced placeholders
       $(dataTag('placeholder')).each(function () {
         var name = $(this).data().templatePlaceholder;
-        console.log('removing placeholder', name);
+        debug('removing placeholder', name);
         $(this).remove();
       });
       // fourth: collect constructed blocks
       $(dataTag('block')).each(function () {
         var name = $(this).data().templateBlock;
-        console.log('storing', name);
+        debug('storing', name);
         opts.blocks[name] = $(this).html();
       });
       // fifth: check parent template
@@ -99,7 +99,7 @@ module.exports = function (settings) {
       view = null;
       if (parent && parent.templateExtend) {
         view = parent.templateExtend;
-        console.log('extending', view);
+        debug('extending', view);
       }
     }
     this.$ = $;
