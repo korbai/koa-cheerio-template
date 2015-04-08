@@ -6,6 +6,7 @@ which I used a lot for my express based projects.
 
 # Features
 - "no template" style server side templating with jQuery syntax
+- optional isomorphic support via browserify (see [example](https://github.com/korbai/koa-cheerio-template/tree/master/example))
 - layout, extend, placeholder, block, include
 - unlimited level of hierarchy
 - html editor friendly
@@ -55,24 +56,9 @@ app.use(function * (next) {
 
 app.listen(3000);
 ```
-
-You can also pass an extra object if you need to modify any
-of the default parsing options:
-
-```js
-var $ = yield this.render('index', {
-  normalizeWhitespace: true,
-  xmlMode: true
-});
-```
-Comment from the [cheerio-readme](https://github.com/cheeriojs/cheerio/blob/master/Readme.md):
-These parsing options are taken directly from [htmlparser2](https://github.com/fb55/htmlparser2/wiki/Parser-options), therefore any options that can be used in `htmlparser2` are valid in cheerio as well. The default options are:
-```js
-{
-    normalizeWhitespace: false,
-    xmlMode: false,
-    decodeEntities: true
-}
+see [cheerio-readme](https://github.com/cheeriojs/cheerio/blob/master/Readme.md)
+and [htmlparser2](https://github.com/fb55/htmlparser2/wiki/Parser-options)
+for more information
 ```
 # License
 

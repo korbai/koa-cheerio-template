@@ -7,9 +7,19 @@
 <div data-template-block="content">
     <h2>Sample for including component</h2>
     <div data-template-include="component"></div>
-    Hello <span id="hello"></span>
+    <p>Hello <span id="hello"></span></p>
+    <p>The most important number is: <span id="goal"></span></p>
 </div>
 
 <script data-template-block="code">
-    var z = 345;
+    var i = 1;
+
+    function demo() {
+        // calling from the client side, see the index.html.js which is bundled
+        mybundle.render($, { name: 'from the Browser #' + i++ });
+        setTimeout(demo, 1000);
+    }
+
+    // in the browser you can see Server for two second, then itt will change to Browser #...
+    setTimeout(demo, 2000);
 </script>
