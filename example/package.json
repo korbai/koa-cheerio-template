@@ -9,8 +9,8 @@
   "author": "Korbai, Zoltan <korbai.zoltan@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "koa": "^0.15.0",
-    "moment": "*",
-    "lodash": "*"
+    "koa": "^1.0.0",
+    "lodash": "^3.10.1",
+    "moment": "^2.10.6"
   }
 }
