@@ -13,7 +13,8 @@ function dataTag(name, value) {
 }
 
 module.exports = function (settings) {
-  var isorenders = {};
+  var genRenders = {};
+  var isoRenders = {};
   settings = settings || {};
   settings.root = settings.root || __dirname;
   settings.ext = settings.ext || '.html';
@@ -26,10 +27,36 @@ module.exports = function (settings) {
   middlewares.push(middleware);
   return compose(middlewares);
 
-  function *isorender(viewfile, $, data) {
+  function *genRender(viewfile) {
+    var name = viewfile.substr(0, viewfile.length - settings.ext.length);
+    var js = name + '.js';
+    var gen = js.substr(settings.root.length);
+    var r = genRenders[js];
+    if (!r) {
+      if (yield fs.exists(js)) {
+        r = require(js);
+        if (r.render) {
+          debug('registering gen render', js);
+        }
+        else {
+          r = {};
+        }
+      }
+      else {
+        r = {};
+      }
+      genRenders[js] = r;
+    }
+    if (r && r.render) {
+      yield r.render.call(this);
+      return;
+    }
+  }
+
+  function *isoRender(viewfile, $, data) {
     var js = viewfile + '.js';
     var iso = js.substr(settings.root.length);
-    var r = isorenders[js];
+    var r = isoRenders[js];
     if (!r) {
       if (yield fs.exists(js)) {
         r = require(js);
@@ -52,7 +79,7 @@ module.exports = function (settings) {
         // so registering an empty stub
         r = {};
       }
-      isorenders[js] = r;
+      isoRenders[js] = r;
     }
     if (r && r.render) {
       r.render($, data);
@@ -74,9 +101,10 @@ module.exports = function (settings) {
       var viewfile = path.join(settings.root, view + settings.ext);
       debug('rendering', viewfile);
       var text = yield fs.readFile(viewfile, 'utf8');
-      $ = cheerio.load(text, opts);
+      this.$ = $ = cheerio.load(text, opts);
+      yield genRender.call(this, viewfile);
       if (settings.bundles) {
-        yield isorender.call(this, viewfile, $, this.data);
+        yield isoRender.call(this, viewfile, $, this.state);
       }
       // first: replace all include-placeholders with given contents
       var includes = [];
@@ -91,8 +119,9 @@ module.exports = function (settings) {
         debug('including', viewfile);
         var text = yield fs.readFile(viewfile, 'utf8');
         $(dataTag('include', name)).replaceWith(text);
+        yield genRender.call(this, viewfile);
         if (settings.bundles) {
-          yield isorender.call(this, viewfile, $, this.data);
+          yield isoRender.call(this, viewfile, $, this.state);
         }
       }
       // second: replace all block-placeholders with opts.blocks

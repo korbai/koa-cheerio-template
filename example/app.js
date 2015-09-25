@@ -1,7 +1,7 @@
 var _ = require('lodash');
 var path = require('path');
 var app = require('koa')();
-var render = require('koa-cheerio-template');
+var render = require('../'); // koa-cheerio-template
 
 // for controllers simplicity combine all parameter sources to one object
 app.use(function *(next) {

@@ -10,7 +10,6 @@
   "license": "MIT",
   "dependencies": {
     "koa": "^0.15.0",
-    "koa-cheerio-template": "*",
     "moment": "*",
     "lodash": "*"
   }
