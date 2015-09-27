@@ -18,11 +18,12 @@ module.exports = function (settings) {
   settings = settings || {};
   settings.root = settings.root || __dirname;
   settings.ext = settings.ext || '.html';
+  settings.server = settings.server || require('koa-static');
 
   var middlewares = [];
   if (settings.bundles) {
     // isomorphic support ON
-    middlewares.push(require('koa-static')(settings.bundles));
+    middlewares.push(settings.server(settings.bundles));
   }
   middlewares.push(middleware);
   return compose(middlewares);
