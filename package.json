@@ -1,6 +1,6 @@
 {
     "name": "koa-cheerio-template",
-    "version": "1.1.5",
+    "version": "1.1.6",
     "description": "Koa view render based on Cheerio for html templating with isomorphic support",
     "main": "index.js",
     "scripts": {

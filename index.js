@@ -75,6 +75,12 @@ module.exports = function (settings) {
             fs.writeFile(p, buf);
           });
         }
+        else if (typeof r === 'function') {
+          r = r($, data);
+          if (!r.render) {
+            r = {};
+          }
+        }
       } else {
         // not to check again and again file exist
         // so registering an empty stub
