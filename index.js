@@ -20,8 +20,8 @@ module.exports = function (settings) {
   settings.server = settings.server || require('koa-static');
 
   var middlewares = [];
-  middlewares.push(settings.server(settings.root));
   middlewares.push(middleware);
+  middlewares.push(settings.server(settings.root));
   return compose(middlewares);
 
   function *genRender(viewfile) {
