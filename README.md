@@ -6,7 +6,7 @@ which I used a lot for my express based projects.
 
 # Features
 - "no template" style server side templating with jQuery syntax
-- optional isomorphic support via browserify (see [example](https://github.com/korbai/koa-cheerio-template/tree/master/example))
+- optional isomorphic support (see [example](https://github.com/korbai/koa-cheerio-template/tree/master/example))
 - layout, extend, placeholder, block, include
 - unlimited level of hierarchy
 - html editor friendly
