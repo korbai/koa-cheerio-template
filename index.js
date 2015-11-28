@@ -21,10 +21,7 @@ module.exports = function (settings) {
   settings.server = settings.server || require('koa-static');
 
   var middlewares = [];
-  if (settings.bundles) {
-    // isomorphic support ON
-    middlewares.push(settings.server(settings.bundles));
-  }
+  middlewares.push(settings.server(settings.root));
   middlewares.push(middleware);
   return compose(middlewares);
 
@@ -60,42 +57,19 @@ module.exports = function (settings) {
     var r = isoRenders[js];
     if (!r) {
       if (yield fs.exists(js)) {
-        r = require(js);
         debug('registering iso render', js);
-
-        if (settings.bundles && r.iso) {
-          debug('registering iso bundle', iso, 'as', r.iso);
-          yield fs.ensureFile(path.join(settings.bundles, iso));
-          var b = browserify({
-            standalone: r.iso
-          });
-          b.add(js);
-          b.bundle(function (err, buf) {
-            var p = path.join(settings.bundles, iso);
-            fs.writeFile(p, buf);
-          });
-        }
-        else if (typeof r === 'function') {
-          r = r($, data);
-          if (!r.render) {
-            r = {};
-          }
-        }
+        r = require(js);
       } else {
         // not to check again and again file exist
         // so registering an empty stub
-        r = {};
+        r = function () { return false; };
       }
       isoRenders[js] = r;
     }
-    if (r && r.render) {
-      r.render($, data);
-
-      if (r.iso) {
-        var script = '<script src="/' + iso + '"></script>';
-        this.bundles = this.bundles || [];
-        this.bundles.push(script);
-      }
+    if (r($, data)) {
+      var script = '<script src="/' + iso + '"></script>';
+      this.bundles = this.bundles || [];
+      this.bundles.push(script);
     }
   }
 
@@ -110,9 +84,7 @@ module.exports = function (settings) {
       var text = yield fs.readFile(viewfile, 'utf8');
       this.$ = $ = cheerio.load(text, opts);
       yield genRender.call(this, viewfile);
-      if (settings.bundles) {
-        yield isoRender.call(this, viewfile, $, this.state);
-      }
+      yield isoRender.call(this, viewfile, $, this.state);
       // first: replace all include-placeholders with given contents
       var includes = [];
       $(dataTag('include')).each(function () {
@@ -127,9 +99,7 @@ module.exports = function (settings) {
         var text = yield fs.readFile(viewfile, 'utf8');
         $(dataTag('include', name)).replaceWith(text);
         yield genRender.call(this, viewfile);
-        if (settings.bundles) {
-          yield isoRender.call(this, viewfile, $, this.state);
-        }
+        yield isoRender.call(this, viewfile, $, this.state);
       }
       // second: replace all block-placeholders with opts.blocks
       for (var name in opts.blocks) {
@@ -200,9 +170,9 @@ module.exports = function (settings) {
       }
     }
     if (this.bundles && this.bundles.length) {
-      var $head = $('head');
+      var $head = $('script[src]').last();
       for (var i=0; i<this.bundles.length; i++) {
-        $head.append(this.bundles[i] + '\n');
+        $head.after('\n' + this.bundles[i] + '\n');
       };
     }
     this.$ = $;
