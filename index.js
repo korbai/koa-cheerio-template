@@ -1,7 +1,6 @@
 var fs = require('co-fs-extra');
 var path = require('path');
 var cheerio = require('cheerio');
-var browserify = require('browserify');
 var compose = require('koa-compose');
 var debug = require('debug')('template');
 //debug = console.log;
